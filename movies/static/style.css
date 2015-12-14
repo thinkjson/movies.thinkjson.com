@@ -1,0 +1,107 @@
+input.zip { padding: 5px 10px; font-size: 26px;height: 30px;width:100px;}
+button.submit { font-size: 26px; padding: 1px 10px;line-height: 40px;margin-bottom:8px;}
+p.submit { text-align: center; }
+
+.right {
+    float: right;
+}
+
+#main {
+    max-width: 960px;
+    margin: 10px auto;
+    padding: 0 10px;
+}
+
+#forkme {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#forkme img {
+    border: 0;
+}
+
+@media (max-width: 1000px) {
+    #forkme {
+        display: none;
+    }
+}
+
+#how-it-works {
+    height: 426px;
+    background: url("/static/how-it-works.png") 50% 50% no-repeat;
+}
+
+#movies {
+    list-style-type: none;
+    margin: 0;
+}
+
+#movies li {
+    margin-left: 0;
+    margin-bottom: 2.5em;
+    min-height: 160px;
+    clear: both;
+}
+
+#movies li img {
+    border: 1px solid #222222;
+    float: left;
+    margin: 12px 10px 30px 0;
+    box-shadow: 3px 3px 2px #333;
+    height: 250px;
+}
+
+.movie-title {
+    font-size: 24px;
+    line-height: 40px;
+    font-weight: bold;
+    margin: 10px 0;
+    text-rendering: optimizelegibility;
+    text-decoration: none;
+    border-bottom: 1px solid #EEEEEE;
+    margin-right: 0.25em;
+}
+.r,.nr {background-color:#900;}
+.pg-13{background-color:#706;}
+.pg,.g,.reserve{background-color:#070;}
+.reserve{font-size:150%;width:150px;float:right;}
+.reserve a{color:#fff;}
+
+
+/*
+ * Rotten Tomatoes styles, via http://images.rottentomatoes.com/assets.html
+ * See also:
+ *   Brand guidlines: https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0B16JHvUXIodiMTliNjBiZTQtMmM4Yy00NGFhLWI3YzItOGM1ZjYwOGVkOGJk&hl=en
+ *     via: http://developer.rottentomatoes.com/apps/tos
+ */
+
+.icon {
+    display: inline-block;
+    vertical-align: text-bottom;
+    background:transparent url('http://images.rottentomatoescdn.com/images/redesign/icons-v2.png') no-repeat -312px -160px;
+}
+
+.icon.huge { width:64px; height:64px; }
+.icon.big { width:48px; height:48px; }
+.icon.medium { width:32px; height:32px; }
+.icon.small { width:24px; height:24px; }
+.icon.tiny { width:16px; height:16px; }
+
+.icon.medium.fresh { background-position:-64px -128px; }
+.icon.medium.rotten { background-position:-96px -128px; }
+.icon.medium.certified { background-position:-160px -128px; }
+.icon.medium.popcorn { background-position:-32px -128px; }
+.icon.medium.spilled { background-position:-128px -128px; }
+
+.icon.small.fresh { background-position:-288px -48px;}
+.icon.small.rotten { background-position:-288px -96px;}
+.icon.small.certified { background-position:-288px -72px;}
+.icon.small.popcorn { background-position:-288px -24px;}
+.icon.small.spilled { background-position:-288px -120px; }
+
+.icon.tiny.fresh { background-position:-256px -144px; }
+.icon.tiny.rotten { background-position:-272px -144px; }
+.icon.tiny.popcorn { background-position:-288px -144px; }
+.icon.tiny.spilled { background-position:-208px -144px; }

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html class="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Top rated movies in Redbox kiosks near {{ zipcode }}</title>
+        <meta name="description" content="Top rated movies in Redbox kiosks near {{ zipcode }}">
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
+        <meta name="MobileOptimized" content="width" />
+        <meta name="HandheldFriendly" content="true" />
+        <!--
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
+        -->
+        <link rel="stylesheet" href="/static/bootstrap-custom.css">
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+
+        <div id="main">
+            <h1>Top rated movies in Redbox kiosks near {{ zipcode }}</h1>
+            <p>Bookmark this page to see the best movies in all of your local Redbox kiosks at a glance. You may also choose to <a href="/">select a different zip code</a>.</p>
+            <ul id="movies">
+                {% for movie in results %}
+                    <li>
+                        <a href="{{ movie.reservation_link }}&mobile=false" class="movie-title">
+                            {% if movie.thumb %}<img src="{{ movie.thumb.replace('ia.media-imdb.com', 'cds.y8j3r7s5.hwcdn.net') }}" alt="thumbnail" />{% endif %}{{ movie.title }}
+                        </a>
+                        <!-- {{ movie.productid }} -->
+                        <span class="badge badge-inverse mpaa-rating {{ movie.mpaarating.lower() }}" title="MPAA Rating">{{ movie.mpaarating }}</span>
+                        <span class="badge badge-inverse format {{ movie.format or movie['@format'] }}" title="Format">{{ movie.format or 'DVD' }}</span>
+                        <span class="badge badge-inverse" title="Score">{{ movie.score }} points</span>
+                        <div class="rotten_tomatoes_scores_container">
+                            <p>
+                                Rotten Tomatoes<sup>&reg;</sup> Scores
+                                {% if movie.critics_score > 59 %}
+                                    <i class="icon tiny fresh"></i>
+                                {% else %}
+                                    <i class="icon tiny rotten"></i>
+                                {% endif %}
+                                <span class="badge badge-inverse critic-score" title="Rotten Tomatoes&reg; Critics Score">{{ movie.critics_score }}%</span>
+
+                                {% if movie.audience_score > 59 %}
+                                    <i class="icon tiny popcorn"></i>
+                                {% else %}
+                                    <i class="icon tiny spilled"></i>
+                                {% endif %}
+                                <span class="badge badge-inverse audience-score" title="Rotten Tomatoes&reg; Audience Score">{{ movie.audience_score }}%</span>
+                            </p>
+                            {% if movie.metascore %}<p>
+                                OMDB Metascore
+                                <span class="badge badge-inverse" title="OMDB Metascore">{{ movie.metascore }}%</span>
+                            </p>{% endif %}
+                        </div>
+                        <div class="description">
+                            {#
+                                "synopsislong" Redbox link:
+                                    In accordance with http://developer.redbox.com/legal, retrieved 2012-09-04, 2.8(c): each time the term “Redbox” appears on any page or screen in your Application, it must link to the Redbox Site;
+                                    In accordance with http://developer.redbox.com/legal, retrieved 2012-09-04, 2.7(m)(ii): [may not] (m) state or imply, whether through use of the Redbox Marks or otherwise, ... (ii) that any of the Content is your own creation, ...
+                                So, let's be safe, and explicit with where we get this content:
+                            #}
+                            <p class="synopsis">
+                                {% if movie.releasedate %}Released {{ movie.releasedate.strftime("%B %Y") }}<br />{% endif %}{{ movie.synopsislong }} <small><a href="{{ movie.websiteurl }}">Read more at Redbox</a></small></p>
+                            <p class="consensus">{{ movie.critics_consensus }} {% if movie.critics_consensus %}<small><a href="http://www.rottentomatoes.com/search/?search={{ movie.title }}">Read more at Rotten Tomatoes</a></small>{% endif %}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+        <!--
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+        -->
+
+        <script>
+        // /:zip
+        $(function() {
+            $('button.submit').click(function(eventObject){
+                eventObject.preventDefault();
+                var zip_code = $('#id_zip').val();
+                window.location.href = "/" + zip_code;
+            });
+        });
+        </script>
+
+        <script>
+            var _gaq=[['_setAccount','UA-34250561-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
