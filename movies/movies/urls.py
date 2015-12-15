@@ -20,6 +20,6 @@ from redbox.views import index, zipcode
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url('', index),
     url(r'^([0-9]{5})', zipcode),
+    url('', index),
 ]

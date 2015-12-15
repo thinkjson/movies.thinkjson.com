@@ -1,6 +1,7 @@
 from datetime import datetime
 import hashlib
 import logging
+from operator import itemgetter
 import re
 import urllib
 from django.core.exceptions import ObjectDoesNotExist
@@ -103,7 +104,7 @@ def download_movies(out):
 
         # This is where the magic happens
         #out.write("Recalculating score for %s" % obj['Title'])
-        movie.thumb = result['Poster'] if 'Poster' in result else ''
+        movie.thumb = result['Poster'].replace('ia.media-imdb.com', 'cds.y8j3r7s5.hwcdn.net') if 'Poster' in result else ''
         try:
             movie.metascore = int(result['Metascore']) if 'Metascore' in result else 0
         except:
@@ -185,15 +186,16 @@ def fetch_inventory(zipcode):
             if inventory['@inventoryStatus'] != "InStock":
                 continue
             movie_id = inventory['@productId']
-            movie = Movie.get_by_id(movie_id)
-            if movie is None:
+            try:
+                movie = Movie.objects.get(productid=movie_id)
+            except ObjectDoesNotExist:
                 # TODO - queue creation
+                logging.error('Movie does not exist in inventory: %s' % movie_id)
                 continue
             if not hasattr(movie, 'score') or not hasattr(movie, 'critics_consensus'):
-                movie.key.delete()
                 continue
             distance = kiosk.get('DistanceFromSearchLocation')
-            output = movie.to_dict()
+            output = movie.__dict__
             output['distance'] = distance
             output['reservation_link'] = "http://www.redbox.com/externalcart?titleID=%s&StoreGUID=%s" % (movie_id.lower(), store_id.lower())
             results.append(output)
@@ -201,17 +203,21 @@ def fetch_inventory(zipcode):
     # Generate a unique list of titles, saving closest
     results_keys = {}
     for result in results:
-        if result['title'] not in results_keys or \
-                        results_keys[result['title']]['distance'] > result['distance']:
-            results_keys[result['title']] = result
-    unique_results = []
-    for result in results_keys:
-        unique_results.append(results_keys[result])
+        if result['format'] not in results_keys:
+            results_keys[result['format']] = {}
+        if result['title'] not in results_keys[result['format']] or \
+                        results_keys[result['format']][result['title']]['distance'] > result['distance']:
+            results_keys[result['format']][result['title']] = result
+    unique_results = {}
+    for format,format_results in results_keys.iteritems():
+        for title, result in format_results.iteritems():
+            if format not in unique_results:
+                unique_results[format] = []
+            unique_results[format].append(result)
 
     # Sort list by score, truncate list
-    unique_results = sorted(unique_results, key=itemgetter('score'), reverse=True)[:50]
+    for format in unique_results.keys():
+        unique_results[format] = sorted(unique_results[format], key=itemgetter('score'), reverse=True)[:50]
 
     # Persist list to memcache
-    cache.set("zipcode-%s" % zipcode, unique_results, 3600)
-    cache.set("zipcode-%s-backup" % zipcode, unique_results)
     return unique_results
