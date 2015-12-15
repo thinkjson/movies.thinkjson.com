@@ -73,9 +73,11 @@
                                     So, let's be safe, and explicit with where we get this content:
                                 {% endcomment %}
                                 <p class="synopsis">
-                                    {% if movie.releasedate %}Released {{ movie.releasedate|date:"%F %Y" }}<br />{% endif %}{{ movie.synopsislong }} <small><a href="{{ movie.websiteurl }}">Read more at Redbox</a></small></p>
+                                    {% if movie.releasedate %}Released {{ movie.releasedate|date:"F Y" }}<br />{% endif %}{{ movie.synopsislong }} <small><a href="{{ movie.websiteurl }}">Read more at Redbox</a></small></p>
                                 <p class="consensus">{{ movie.critics_consensus }} {% if movie.critics_consensus %}<small><a href="http://www.rottentomatoes.com/search/?search={{ movie.title }}">Read more at Rotten Tomatoes</a></small>{% endif %}</p>
                             </div>
+
+                            <div class="clearfix"></div>
                         </li>
                     {% endfor %}
                     </ul>

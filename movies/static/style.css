@@ -40,17 +40,27 @@ p.submit { text-align: center; }
 
 .movies li {
     margin-left: 0;
-    margin-bottom: 2.5em;
+    margin-bottom: 30px;
     min-height: 160px;
     clear: both;
+    padding: 10px 15px;
 }
 
 .movies li img {
     border: 1px solid #222222;
     float: left;
-    margin: 12px 10px 30px 0;
+    margin: 12px 25px 30px 0;
     box-shadow: 3px 3px 2px #333;
     height: 250px;
+}
+
+.movies li:nth-child(even) {
+    background: #eee;
+}
+
+.movies li:nth-child(even) img {
+    float: right;
+    margin: 12px 0 30px 25px;
 }
 
 .movie-title {
