@@ -91,7 +91,11 @@ def download_movies(out):
               % (urllib.quote(unicodedata.normalize('NFKD', movie.title).encode('ascii', 'ignore')))
         if hasattr(movie, 'releaseyear'):
             url += "&y=%s" % (movie.releaseyear)
-        response = fetch(url, timeout=600)
+        try:
+            response = fetch(url, timeout=600)
+        except ValueError:
+            logging.error("Could not retrieve Rotten Tomatoes information for %s: %s" % (obj['Title'], url))
+            continue
 
         if response.status_code != 200:
             logging.error("Could not retrieve Rotten Tomatoes information for %s: %s" % (obj['Title'], url))
@@ -104,7 +108,7 @@ def download_movies(out):
 
         # This is where the magic happens
         #out.write("Recalculating score for %s" % obj['Title'])
-        movie.thumb = result['Poster'].replace('ia.media-imdb.com', 'cds.y8j3r7s5.hwcdn.net') if 'Poster' in result else ''
+        movie.thumb = result['Poster'].replace('ia.media-imdb.com', 'movies.thinkjson.com').replace('http://', '//') if 'Poster' in result else ''
         try:
             movie.metascore = int(result['Metascore']) if 'Metascore' in result else 0
         except:
@@ -213,6 +217,7 @@ def fetch_inventory(zipcode):
         for title, result in format_results.iteritems():
             if format not in unique_results:
                 unique_results[format] = []
+            result['thumb'] = result['thumb'].replace('http://cds.y8j3r7s5.hwcdn.net/', '//movies.thinkjson.com/')
             unique_results[format].append(result)
 
     # Sort list by score, truncate list
