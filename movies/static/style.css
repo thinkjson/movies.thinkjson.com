@@ -90,7 +90,7 @@ p.submit { text-align: center; }
 .icon {
     display: inline-block;
     vertical-align: text-bottom;
-    background:transparent url('http://images.rottentomatoescdn.com/images/redesign/icons-v2.png') no-repeat -312px -160px;
+    background:transparent url('//movies.thinkjson.com/images/redesign/icons-v2.png') no-repeat -312px -160px;
 }
 
 .icon.huge { width:64px; height:64px; }
