@@ -11,7 +11,9 @@ from django.core.cache import cache
 import time
 import unicodedata
 from redbox.models import Movie
+import xmltodict
 
+logger = logging.getLogger('redbox')
 
 class Response():
     def __init__(self, status_code, content, size):
@@ -27,7 +29,12 @@ def fetch(url, **kwargs):
     response = cache.get(cache_key)
     if response is None:
         api_response = requests.get(url, **kwargs)
-        response = Response(api_response.status_code, api_response.json(), len(api_response.text))
+        logger.debug(api_response.text)
+        response = Response(
+            api_response.status_code,
+            api_response.json() if 'json' in api_response.headers['Content-Type'] \
+            else xmltodict.parse(api_response.text),
+            len(api_response.text))
         cache.set(cache_key, response, 3600)
         response.cached = None
     if not hasattr(response, 'size'):
@@ -41,7 +48,6 @@ def download_movies(out):
     out.flush()
     response = fetch(url,
         headers={
-          'Accept': 'application/json',
           'X-Redbox-ApiKey': settings.REDBOX_APIKEY
         },
         timeout=600)
@@ -94,11 +100,11 @@ def download_movies(out):
         try:
             response = fetch(url, timeout=600)
         except ValueError:
-            logging.error("Could not retrieve Rotten Tomatoes information for %s: %s" % (obj['Title'], url))
+            logger.error("Could not retrieve Rotten Tomatoes information for %s: %s" % (obj['Title'], url))
             continue
 
         if response.status_code != 200:
-            logging.error("Could not retrieve Rotten Tomatoes information for %s: %s" % (obj['Title'], url))
+            logger.error("Could not retrieve Rotten Tomatoes information for %s: %s" % (obj['Title'], url))
             continue
         else:
             result = response.content
@@ -156,11 +162,10 @@ def download_movies(out):
 def fetch_inventory(zipcode):
     # Fetch inventory for all kiosks within 10 miles
     results = []
-    logging.info("Fetching kiosks near %s" % zipcode)
+    logger.info("Fetching kiosks near %s" % zipcode)
     url = "%sstores/postalcode/%s?apiKey=%s" \
           % (settings.REDBOX_URL, zipcode, settings.REDBOX_APIKEY)
     response = fetch(url, headers={
-        'Accept': 'application/json',
         'X-Redbox-ApiKey': settings.REDBOX_APIKEY
     })
     if response.status_code != 200:
@@ -175,15 +180,14 @@ def fetch_inventory(zipcode):
         store_id = kiosk['@storeId']
         lat = kiosk['Location'].get('@lat')
         lon = kiosk['Location'].get('@long')
-        logging.info("Looking up inventory for store %s,%s" % (lat,lon))
+        logger.info("Looking up inventory for store %s,%s" % (lat,lon))
         url = "%sinventory/stores/latlong/%s,%s?apiKey=%s" \
               % (settings.REDBOX_URL, lat, lon, settings.REDBOX_APIKEY)
         response = fetch(url, headers={
-            'Accept': 'application/json',
             'X-Redbox-ApiKey': settings.REDBOX_APIKEY
         })
         if response.status_code != 200:
-            logging.error("Could not retrieve inventory for store: %s,%s" % (lat,lon))
+            logger.error("Could not retrieve inventory for store: %s,%s" % (lat,lon))
             continue
         inventory_root = response.content
         for inventory in inventory_root['Inventory']['StoreInventory'][0]['ProductInventory']:
@@ -194,7 +198,7 @@ def fetch_inventory(zipcode):
                 movie = Movie.objects.get(productid=movie_id)
             except ObjectDoesNotExist:
                 # TODO - queue creation
-                logging.error('Movie does not exist in inventory: %s' % movie_id)
+                logger.error('Movie does not exist in inventory: %s' % movie_id)
                 continue
             if not hasattr(movie, 'score') or not hasattr(movie, 'critics_consensus'):
                 continue
